@@ -8,24 +8,28 @@ SHAPES = {
     "B": "paper",
     "Y": "paper",
     "C": "scissors",
-    "Z": "scissors"
+    "Z": "scissors",
 }
-SCORES = {
-    "rock": 1,
-    "paper": 2,
-    "scissors": 3
-}
-ROUND_SCORING = {
-    "win": 6,
-    "draw": 3,
-    "lose": 0
-}
+SCORES = {"rock": 1, "paper": 2, "scissors": 3}
+ROUND_SCORING = {"win": 6, "draw": 3, "lose": 0}
 
 
 def cli() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="advent-of-code cli")
-    parser.add_argument('--submit', action='store_true', required=False, default=False, help="Submit to Advent Of Code")
-    parser.add_argument('--test', action='store_true', required=False, default=False, help="Run test functions instead")
+    parser.add_argument(
+        "--submit",
+        action="store_true",
+        required=False,
+        default=False,
+        help="Submit to Advent Of Code",
+    )
+    parser.add_argument(
+        "--test",
+        action="store_true",
+        required=False,
+        default=False,
+        help="Run test functions instead",
+    )
     return parser.parse_args()
 
 
@@ -55,11 +59,7 @@ def play(opponent, me):
 
 
 def strategy(shape, goal):
-    win_conditions = {
-        "paper": "rock",
-        "rock": "scissors",
-        "scissors": "paper"
-    }
+    win_conditions = {"paper": "rock", "rock": "scissors", "scissors": "paper"}
     lose_conditions = {v: k for k, v in win_conditions.items()}
     me = None
     if goal == "X":
@@ -88,11 +88,7 @@ def part_one(puzzle_input) -> int:
 def part_two(puzzle_input) -> int:
     scores = []
     for item in puzzle_input:
-        goals = {
-            "X": "lose",
-            "Y": "draw",
-            "Z": "win"
-        }
+        goals = {"X": "lose", "Y": "draw", "Z": "win"}
         opponent, goal = item.split()
         opponent = SHAPES[opponent]
         me = strategy(opponent, goal)
@@ -132,5 +128,5 @@ def main() -> None:
             aocd.submit(answer=result_part_two, part=2, day=2, year=2022)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
