@@ -3,8 +3,17 @@ import argparse
 import string
 import aocd
 
+from itertools import islice
+
+
 CHAR_SET = list(string.ascii_lowercase + string.ascii_uppercase)
-TEST_DATA = """vJrwpWtwJgWrhcsFMMfFFhFp
+TEST_DATA_PART_ONE = """vJrwpWtwJgWrhcsFMMfFFhFp
+jqHRNqRjqzjGDLGLrsFMfFZSrLrFZsSL
+PmmdzqPrVvPwwTWBwg
+wMqvLMZHhHMvwLHjbvcjnnSBnvTQFn
+ttgJtRGJQctTZtZT
+CrZsJsPPZsGzwwsLwLmpwMDw""".split("\n")
+TEST_DATA_PART_TWO = """vJrwpWtwJgWrhcsFMMfFFhFp
 jqHRNqRjqzjGDLGLrsFMfFZSrLrFZsSL
 PmmdzqPrVvPwwTWBwg
 wMqvLMZHhHMvwLHjbvcjnnSBnvTQFn
@@ -34,7 +43,19 @@ def cli() -> argparse.Namespace:
     return conf
 
 
-def chunk_input(line: str) -> list:
+def chunk(input_data: list, chunk_size: int = 3) -> list:
+    """
+    Break a list into chunks of chunk_size elements
+    :param input_data:
+    :param chunk_size:
+    :return:
+    """
+    input_data = iter(input_data)
+    result = iter(lambda : tuple(islice(input_data, chunk_size)), ())
+    return result
+
+
+def split_into_two(line: str) -> list:
     """
     Break input into 2 halves
     :param line:
@@ -47,14 +68,15 @@ def chunk_input(line: str) -> list:
     return [first_half, second_half]
 
 
-def common_chars(string_a: str, string_b: str) -> str:
+def intersect(*args) -> str:
     """
-    Find the set intersection of string_a and string_b, return as string
+    Find the set intersection of multiple strings
     :param string_a:
     :param string_b:
     :return:
     """
-    return "".join(set(string_a).intersection(string_b))
+    result = "".join(set(args[0]).intersection(*args[1:]))
+    return result
 
 
 def part_one(input_data: list) -> int:
@@ -66,24 +88,41 @@ def part_one(input_data: list) -> int:
     """
     common = ''
     for rucksack in input_data:
-        compartment_a, compartment_b = chunk_input(rucksack)
-        common += common_chars(compartment_a, compartment_b)
+        compartment_a, compartment_b = split_into_two(rucksack)
+        common += intersect(compartment_a, compartment_b)
     priorities_sum = sum(list(map(lambda x: (CHAR_SET.index(x) + 1), common)))
 
     return priorities_sum
 
 
+def part_two(input_data):
+    """
+    find sum of common item type for each of the 3-line groups of elves in input data
+    :param input_data:
+    :return:
+    """
+    common = ''
+    for group in chunk(input_data, 3):
+        common += intersect(*group)
+    priorities_sum = sum(list(map(lambda x: (CHAR_SET.index(x) + 1), common)))
+    return priorities_sum
+
 def main() -> None:
     conf = cli()
     if conf.test:
-        input_data = TEST_DATA
+        input_data_part_one = TEST_DATA_PART_ONE
+        input_data_part_two = TEST_DATA_PART_TWO
     else:
-        input_data = aocd.lines
+        input_data_part_one = aocd.lines
+        input_data_part_two = aocd.lines
 
-    part_one_result = part_one(input_data)
+    part_one_result = part_one(input_data_part_one)
+    part_two_result = part_two(input_data_part_two)
     print(f"Part One: {part_one_result}")
+    print(f"Part Two: {part_two_result}")
     if conf.submit and not conf.test:
         aocd.submit(answer=part_one_result, part=1, day=3, year=2022)
+        aocd.submit(answer=part_two_result, part=2, day=3, year=2022)
 
 
 if __name__ == "__main__":
