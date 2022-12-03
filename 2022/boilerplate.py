@@ -12,7 +12,17 @@ def cli() -> argparse.Namespace:
         default=False,
         help="Submit to Advent Of Code",
     )
-    return parser.parse_args()
+    parser.add_argument(
+        "--test",
+        action="store_true",
+        required=False,
+        default=False,
+        help="Run test functions instead",
+    )
+    conf = parser.parse_args()
+    if conf.test:
+        conf.submit = False
+    return conf
 
 
 def part_one():
