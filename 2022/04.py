@@ -33,22 +33,38 @@ def cli() -> argparse.Namespace:
     return conf
 
 
+def ranges_overlap(range_declaration: str) -> bool:
+    """
+    return True if range_a is fully contained by range_b, or vice versa
+    :param range_declaration: the ranges declaration in format "N-N,N-N"
+    :return:
+    """
+    fields = [set(range([int(i) for i in j.split("-")][0], [int(i) for i in j.split("-")][-1] + 1)) for j in range_declaration.split(",")]
+    if fields[0].issubset(fields[1]) or fields[1].issubset(fields[0]):
+        return True
+    return False
+
+
 def part_one(input_data):
     """
     work out which elf assignments are fully contained by other elves' assignments
     return the number of assignment pairs where one fully contains the other
     :return:
     """
-    fully_contained_count = 0
-    for elf in input_data:
-        fields = [set(range([int(i) for i in j.split("-")][0], [int(i) for i in j.split("-")][-1] + 1)) for j in elf.split(",")]
-        if fields[0].issubset(fields[1]) or fields[1].issubset(fields[0]):
-            fully_contained_count += 1
-    return fully_contained_count
+    return sum([1 for i in input_data if ranges_overlap(i)])
 
 
 def test_part_one():
     print(f"Part One: {part_one(TEST_INPUT_PART_ONE)}")
+
+
+def part_two(input_data):
+    """
+    Same as part one, but now we want to know where a section fully contains any other section, not just
+    for a single elf
+    :return:
+    """
+
 
 
 def main() -> None:
