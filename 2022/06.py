@@ -59,14 +59,14 @@ def part_one(in_data):
     return first_marker_pos
 
 
-def part_two(in_data, start_position):
+def part_two(in_data):
     """
     Now look for messages.  These will be 14 distinct chars instead
     :param in_data:
     :return:
     """
     first_message_marker_pos = 0
-    for i, val in enumerate(in_data[start_position:]):
+    for i, val in enumerate(in_data):
         start = i
         end = i+14
         slice = in_data[start:end]
@@ -84,13 +84,12 @@ def main() -> None:
             print(f"part_one -- expected: {test_cfg['first_marker_pos']}, seen: {result}")
             assert result == test_cfg['first_marker_pos']
         for test_cfg in test_data_part_two:
-            start_pos = part_one(test_cfg['input'])
-            result = part_two(test_cfg['input'], start_pos)
+            result = part_two(test_cfg['input'])
             print(f"part_two -- expected: {test_cfg['first_marker_pos']}, seen: {result}")
             assert result == test_cfg['first_marker_pos']
     else:
         result_part_one = part_one(aocd.data.strip())
-        result_part_two = part_two(aocd.data.strip(), result_part_one)
+        result_part_two = part_two(aocd.data.strip())
         print(f"part one: {result_part_one}")
         print(f"part two: {result_part_two}")
         if conf.submit:
