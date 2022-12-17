@@ -31,49 +31,48 @@ def cli() -> argparse.Namespace:
     return conf
 
 
-def parse_into_matrix(input_data: list) -> list:
+def parser(input_data: list) -> list:
     """
-    parse a list of 5 digit numbers into a list of lists of single digit numbers
+    parse input, and return a list
     :param input_data:
     :return:
     """
-    return list(map(lambda x: [int(i) for i in x], input_data))
+    trees = list(map(lambda x: [int(i) for i in x], input_data))
+    visible = list(map(lambda x: [False for i in x], input_data))
+    return trees, visible
 
 
-def is_visible(input_matrix: list, row: int, column: int) -> bool:
+def get_column(trees, column):
+    return [trees[x][column] for x in range(len(trees))]
+
+
+def find_visible_trees(trees, visible):
     """
     Return True if the outer matrix elements in "cardinal" directions
     are smaller than the one located at intersection of row, column
     :param input_matrix:
     :return:
     """
-    tree_height = input_matrix[row][column]
-    views = [
-        max(input_matrix[row][:column]),
-        max(input_matrix[row][column+1:]),
-        max([input_matrix[x][column] for x in range(0, row)]),
-        max([input_matrix[x][column] for x in range(row+1, len(input_matrix))])
-    ]
-    seen = False
-    for height in views:
-        seen = height > tree_height
-    return seen
+    for row in range(len(trees)):
+        for col in range(len(trees[row])):
+            tree_height = trees[row][col]
+            if row == 0 or row == len(trees) - 1:
+                visible[row][col] = True
+            elif col == 0 or col == len(trees[row]) - 1:
+                visible[row][col] = True
+            else:
+                from_left = max(trees[row][:col])
+                from_right = max(trees[row][col + 1:])
+                from_top = max(get_column(trees, col)[:row])
+                from_bottom = max(get_column(trees, col)[row + 1:])
+                visible[row][col] = (tree_height > from_left or tree_height > from_right or tree_height > from_top or tree_height > from_bottom)
+    return visible
 
 
 def part_one(in_data):
-    matrix = parse_into_matrix(in_data)
-    inner_matrix = [x[1:-1] for x in matrix[1:-1]]
-    total_trees = sum([len(x) for x in matrix])
-    inner_trees = sum([len(x) for x in inner_matrix])
-    visible_trees = total_trees - inner_trees
-    visible = 0
-    for i in range(1, len(matrix) - 1):
-        row = matrix[i]
-        for j in range(1, len(row) - 1):
-            _vis = is_visible(matrix, i, j)
-            if _vis:
-                visible += 1
-    return visible_trees + visible
+    trees, visible = parser(in_data)
+    visible = find_visible_trees(trees, visible)
+    return len([b for a in visible for b in a if b is True])
 
 
 def main() -> None:
